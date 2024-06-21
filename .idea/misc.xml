@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="FormatOnSaveOptions">
+    <option name="myRunOnSave" value="true" />
+    <option name="myAllFileTypesSelected" value="false" />
+    <option name="mySelectedFileTypes">
+      <set>
+        <option value="CSS" />
+        <option value="CassandraQL" />
+        <option value="DTD" />
+        <option value="ECMAScript 6" />
+        <option value="Flow" />
+        <option value="HTML" />
+        <option value="HTTP Request" />
+        <option value="HiveQL" />
+        <option value="JSHint" />
+        <option value="JSON" />
+        <option value="JSON-lines" />
+        <option value="JSON5" />
+        <option value="JSX Harmony" />
+        <option value="JavaScript" />
+        <option value="NatVis" />
+        <option value="PowerShell" />
+        <option value="QmlType" />
+        <option value="Qt UI file" />
+        <option value="RNG Compact" />
+        <option value="Redis" />
+        <option value="Rust" />
+        <option value="SQL" />
+        <option value="SVG" />
+        <option value="Shell Script" />
+        <option value="SourceMap" />
+        <option value="TOML" />
+        <option value="TypeScript" />
+        <option value="TypeScript JSX" />
+        <option value="XHTML" />
+        <option value="XML" />
+        <option value="YAML" />
+        <option value="qrc" />
+        <option value="tsconfig" />
+      </set>
+    </option>
+  </component>
+  <component name="ProjectInspectionProfilesVisibleTreeState">
+    <entry key="Project Default">
+      <profile-state>
+        <expanded-state>
+          <State>
+            <id>Cargo.tomlRust</id>
+          </State>
+          <State>
+            <id>Dockerfile</id>
+          </State>
+          <State>
+            <id>LintRust</id>
+          </State>
+          <State>
+            <id>LintsRust</id>
+          </State>
+          <State>
+            <id>Rust</id>
+          </State>
+          <State>
+            <id>命名约定LintsRust</id>
+          </State>
+        </expanded-state>
+      </profile-state>
+    </entry>
+  </component>
+</project>
