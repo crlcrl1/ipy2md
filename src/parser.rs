@@ -1,6 +1,7 @@
 use ansi_to_html::convert;
 use json::{parse, JsonValue};
 
+/// A struct representing a Jupyter notebook
 pub struct Notebook {
     pub cells: Vec<Cell>,
 }
@@ -116,6 +117,7 @@ impl Notebook {
     }
 }
 
+/// A struct representing a cell in a Jupyter notebook
 pub enum CellType {
     Code,
     Markdown,
