@@ -19,4 +19,12 @@ pub(crate) struct Params {
 
     #[arg(short, long, help = "Whether to show the output in the ipynb file")]
     pub(crate) show_output: bool,
+
+    #[arg(
+        short,
+        long,
+        help = "Whether to show separator between blocks",
+        default_value = "false"
+    )]
+    pub(crate) block_separator: bool,
 }
