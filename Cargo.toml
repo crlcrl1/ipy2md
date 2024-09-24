@@ -1,11 +1,11 @@
 [package]
 name = "ipy2md"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 authors = ["crlcrl1"]
 categories = ["command-line-utilities"]
 
 [dependencies]
 json = "0.12.4"
-clap = { version = "4.5.7", features = ["derive"] }
+clap = { version = "4.5.18", features = ["derive"] }
 ansi-to-html = { version = "0.2.1", features = ["lazy-init"] }
