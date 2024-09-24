@@ -6,6 +6,7 @@ authors = ["crlcrl1"]
 categories = ["command-line-utilities"]
 license = "MIT"
 description = "A command line tool to convert ipython notebook to markdown"
+repository = "https://github.com/crlcrl1/ipy2md"
 
 [dependencies]
 json = "0.12.4"
