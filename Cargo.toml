@@ -4,6 +4,8 @@ version = "0.1.2"
 edition = "2021"
 authors = ["crlcrl1"]
 categories = ["command-line-utilities"]
+license = "MIT"
+description = "A command line tool to convert ipython notebook to markdown"
 
 [dependencies]
 json = "0.12.4"

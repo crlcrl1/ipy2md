@@ -25,7 +25,7 @@ fn convert_space(input: &str) -> String {
 }
 
 impl Notebook {
-    /// Parse the JSON string and return a `Notebook` struct
+    /// Parse the JSON string and return a [Notebook] struct
     pub fn from_string(json_string: &str) -> Option<Self> {
         let parsed = parse(json_string).ok()?;
         let cells = parsed["cells"]
@@ -123,6 +123,7 @@ pub enum CellType {
     Markdown,
 }
 
+/// A struct representing a cell in a Jupyter notebook
 pub struct Cell {
     pub cell_type: CellType,
     pub source: String,

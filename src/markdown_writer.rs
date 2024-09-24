@@ -1,6 +1,11 @@
 use crate::params::Params;
 use crate::parser::{CellType, Notebook};
 
+/// Convert a notebook to markdown
+///
+/// # Arguments
+/// * `notebook` - The notebook to convert
+/// * `params` - The parameters to use
 pub fn get_markdown_string(notebook: &Notebook, params: &Params) -> String {
     let mut markdown = String::new();
     let cell_count = notebook.cells.len();

@@ -1,5 +1,6 @@
 use clap::Parser;
 
+/// The command line parameters
 #[derive(Debug, Parser)]
 #[command(
     version,
