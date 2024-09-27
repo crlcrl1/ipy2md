@@ -19,7 +19,7 @@ pub fn get_directory(file: &str) -> String {
 /// * `path` - The path to the directory
 pub fn create_directory(path: &str) {
     if !Path::new(path).exists() && fs::create_dir_all(path).is_err() {
-        show_error("Failed to create directory")
+        show_error(&format!("Failed to create directory {}", path));
     }
 }
 

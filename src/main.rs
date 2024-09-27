@@ -3,11 +3,11 @@ mod params;
 mod parser;
 mod util;
 
-use crate::util::{create_directory, get_directory, show_error};
 use clap::Parser;
 use params::Params;
 use parser::Notebook;
 use std::fs::read_to_string;
+use util::{create_directory, get_directory, show_error};
 
 fn main() {
     let params = Params::parse();
