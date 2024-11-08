@@ -18,7 +18,12 @@ pub(crate) struct Params {
     )]
     pub(crate) output_path: String,
 
-    #[arg(short, long, help = "Whether to show the output in the ipynb file")]
+    #[arg(
+        short,
+        long,
+        help = "Whether to show the output in the ipynb file",
+        default_value = "true"
+    )]
     pub(crate) show_output: bool,
 
     #[arg(
