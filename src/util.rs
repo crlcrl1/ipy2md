@@ -24,6 +24,10 @@ pub fn create_directory(path: &str) {
 }
 
 pub fn show_error(msg: &str) -> ! {
-    eprintln!("\x1b[1;31m{}\x1b[0m", msg);
+    eprintln!("\x1b[1;31mError:\x1b[0m {}", msg);
     exit(1)
+}
+
+pub fn show_warning(msg: &str) {
+    eprintln!("\x1b[1;33mWarrning:\x1b[0m {}", msg);
 }

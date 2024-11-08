@@ -1,6 +1,6 @@
 [package]
 name = "ipy2md"
-version = "0.1.3"
+version = "0.2.0"
 edition = "2021"
 authors = ["crlcrl1"]
 categories = ["command-line-utilities"]
@@ -10,5 +10,7 @@ repository = "https://github.com/crlcrl1/ipy2md"
 
 [dependencies]
 json = "0.12.4"
-clap = { version = "4.5.18", features = ["derive"] }
+clap = { version = "4.5.20", features = ["derive"] }
 ansi-to-html = { version = "0.2.1", features = ["lazy-init"] }
+base64 = "0.22.1"
+image = "0.25.5"

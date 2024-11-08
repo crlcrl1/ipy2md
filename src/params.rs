@@ -7,7 +7,7 @@ use clap::Parser;
     about = "A simple CLI app to generate markdown files from ipynb files"
 )]
 pub(crate) struct Params {
-    #[arg(short, long = "input", help = "The input ipynb file", required = true)]
+    #[arg(help = "The input ipynb file", required = true)]
     pub(crate) input_path: String,
 
     #[arg(
@@ -28,4 +28,11 @@ pub(crate) struct Params {
         default_value = "false"
     )]
     pub(crate) block_separator: bool,
+
+    #[arg(
+        long,
+        help = "The directory to save images",
+        default_value = "./images"
+    )]
+    pub(crate) image_dir: String,
 }

@@ -1,12 +1,50 @@
+use crate::util::show_warning;
 use ansi_to_html::convert;
+use base64::prelude::BASE64_STANDARD;
+use base64::Engine;
+use image::{DynamicImage, ImageReader};
 use json::{parse, JsonValue};
+use std::io::Cursor;
+
+#[derive(Default)]
+struct ImageNameGenerator {
+    counter: usize,
+}
+
+impl ImageNameGenerator {
+    fn generate(&mut self, image_type: &str) -> String {
+        self.counter += 1;
+        format!("image_{}.{}", self.counter, image_type)
+    }
+}
+
+struct Context {
+    image_name_generator: ImageNameGenerator,
+    image_dir: String,
+}
+
+impl Context {
+    fn new(image_dir: String) -> Self {
+        Self {
+            image_name_generator: ImageNameGenerator::default(),
+            image_dir,
+        }
+    }
+
+    fn generate_image_path(&mut self, image_type: &str) -> String {
+        format!(
+            "{}/{}",
+            self.image_dir,
+            self.image_name_generator.generate(image_type)
+        )
+    }
+}
 
 /// A struct representing a Jupyter notebook
 pub struct Notebook {
     pub cells: Vec<Cell>,
 }
 
-#[inline(always)]
 fn convert_space(input: &str) -> String {
     let mut flag = false;
     let mut output = String::new();
@@ -24,10 +62,24 @@ fn convert_space(input: &str) -> String {
     output
 }
 
+fn get_image(data: &[u8]) -> Option<DynamicImage> {
+    let fig = BASE64_STANDARD.decode(data);
+    if let Ok(fig) = fig {
+        ImageReader::new(Cursor::new(fig))
+            .with_guessed_format()
+            .ok()?
+            .decode()
+            .ok()
+    } else {
+        None
+    }
+}
+
 impl Notebook {
     /// Parse the JSON string and return a [Notebook] struct
-    pub fn from_string(json_string: &str) -> Option<Self> {
+    pub fn from_string(json_string: &str, image_dir: String) -> Option<Self> {
         let parsed = parse(json_string).ok()?;
+        let mut context = Context::new(image_dir);
         let cells = parsed["cells"]
             .members()
             .filter_map(|cell| {
@@ -38,14 +90,15 @@ impl Notebook {
                 };
                 let source_part = &cell["source"];
                 let source = Self::get_source(source_part);
-                let outputs = Self::get_output(&cell["outputs"]);
+                let (outputs, images) = Self::get_output(&cell["outputs"], &mut context);
                 let error_outputs = Self::get_error_output(&cell["outputs"]);
-                Some(Cell::new(cell_type, source, outputs, error_outputs))
+                Some(Cell::new(cell_type, source, outputs, error_outputs, images))
             })
             .collect();
         Some(Self { cells })
     }
 
+    /// Get the source code from the source part of a cell
     fn get_source(source_part: &JsonValue) -> String {
         if source_part.is_string() {
             source_part.as_str().unwrap_or_default().to_string()
@@ -58,7 +111,10 @@ impl Notebook {
         }
     }
 
-    fn get_output(output_part: &JsonValue) -> String {
+    /// Get the output from the output part of a cell
+    fn get_output(output_part: &JsonValue, ctx: &mut Context) -> (String, Vec<Image>) {
+        let mut res = String::new();
+        let mut images = vec![];
         output_part
             .members()
             .map(|section| {
@@ -66,14 +122,18 @@ impl Notebook {
                 match output_type {
                     "stream" => Self::get_stream_output(&section),
                     "execute_result" => Self::get_execute_result_output(&section),
-                    _ => "".to_string(),
+                    "display_data" => Self::get_display_data_output(&section, ctx),
+                    _ => ("".to_string(), vec![]),
                 }
             })
-            .collect()
+            .for_each(|(output, imgs)| {
+                res.push_str(&output);
+                images.extend(imgs);
+            });
+        (res, images)
     }
 
-    #[inline(always)]
-    fn get_execute_result_output(output_part: &JsonValue) -> String {
+    fn get_execute_result_output(output_part: &JsonValue) -> (String, Vec<Image>) {
         let data = &output_part["data"];
         let mut res = vec![];
         data.entries().for_each(|(key, value)| match key {
@@ -85,15 +145,15 @@ impl Notebook {
             }),
             _ => {}
         });
-        res.join("")
+        (res.join(""), vec![])
     }
 
-    #[inline(always)]
-    fn get_stream_output(output_part: &JsonValue) -> String {
-        output_part["text"]
+    fn get_stream_output(output_part: &JsonValue) -> (String, Vec<Image>) {
+        let text = output_part["text"]
             .members()
             .map(|line| line.as_str().unwrap_or_default().trim_end().to_string() + "<br/>\n")
-            .collect()
+            .collect();
+        (text, vec![])
     }
 
     fn get_error_output(output_part: &JsonValue) -> String {
@@ -102,6 +162,7 @@ impl Notebook {
             .filter_map(|section| {
                 let output_type = section["output_type"].as_str().unwrap_or_default();
                 if output_type == "error" {
+                    // Get Python traceback
                     let traceback = section["traceback"]
                         .members()
                         .map(|line| convert(line.as_str().unwrap_or_default()).unwrap_or_default())
@@ -115,6 +176,33 @@ impl Notebook {
             })
             .collect()
     }
+
+    /// Get the display data output (e.g. images) from the output part of a cell
+    fn get_display_data_output(output_part: &JsonValue, ctx: &mut Context) -> (String, Vec<Image>) {
+        let data = &output_part["data"];
+        let mut text = vec![];
+        let mut images = vec![];
+        data.entries().for_each(|(key, value)| {
+            if key.starts_with("image/") {
+                if let Some(image) = get_image(value.as_str().unwrap_or_default().as_bytes()) {
+                    let name = ctx.generate_image_path(&key[6..]);
+                    images.push(Image {
+                        path: name.clone(),
+                        data: image,
+                    });
+                    text.push(format!("<img src=\"{}\"/>", name));
+                } else {
+                    show_warning("Failed to decode image");
+                }
+            }
+        });
+        (text.join("\n"), images)
+    }
+}
+
+pub struct Image {
+    pub path: String,
+    pub data: DynamicImage,
 }
 
 /// A struct representing a cell in a Jupyter notebook
@@ -129,6 +217,7 @@ pub struct Cell {
     pub source: String,
     pub outputs: String,
     pub error_outputs: String,
+    pub images: Vec<Image>,
 }
 
 impl Cell {
@@ -137,12 +226,14 @@ impl Cell {
         source: String,
         outputs: String,
         error_outputs: String,
+        images: Vec<Image>,
     ) -> Self {
         Self {
             cell_type,
             source,
             outputs,
             error_outputs,
+            images,
         }
     }
 }

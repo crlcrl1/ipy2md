@@ -1,5 +1,7 @@
+use crate::markdown_parser::{CellType, Notebook};
 use crate::params::Params;
-use crate::parser::{CellType, Notebook};
+use crate::util::{get_directory, show_warning};
+use std::path::Path;
 
 /// Convert a notebook to markdown
 ///
@@ -25,6 +27,19 @@ pub fn get_markdown_string(notebook: &Notebook, params: &Params) -> String {
                         markdown.push_str("<p style='font-family: Consolas,system-ui'>");
                         markdown.push_str(cell.error_outputs.as_str());
                         markdown.push_str("\n</p>\n\n");
+                    }
+                    if !cell.images.is_empty() {
+                        for image in &cell.images {
+                            let path =
+                                Path::new(&get_directory(&params.output_path)).join(&image.path);
+                            image.data.save(&path).unwrap_or_else(|_| {
+                                if let Some(path) = path.to_str() {
+                                    show_warning(&format!("Could not save image {}", path));
+                                } else {
+                                    show_warning("Invalid image path");
+                                }
+                            });
+                        }
                     }
                 }
             }
